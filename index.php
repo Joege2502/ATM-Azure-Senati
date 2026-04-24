@@ -12,7 +12,7 @@ $conn = sqlsrv_connect($serverName, $connectionOptions);
 $mensaje = "";
 $acceso_concedido = false; 
 
-// --- MEJORA: CAPTURAR ESTADO DESDE LA URL ---
+// Verificar estado desde la URL para mostrar la tabla o el error
 if (isset($_GET['login'])) {
     if ($_GET['login'] === 'success') {
         $acceso_concedido = true;
@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_iniciar'])) {
         $sql_audit = "INSERT INTO auditoria (usuario_intentado, resultado) VALUES (?, 'CORRECTO')";
         sqlsrv_query($conn, $sql_audit, array($usuario_ingresado));
         
-        // REDIRECCIÓN LIMPIA (Post-Redirect-Get)
+        // REDIRECCIÓN A LA MISMA PÁGINA CON PARÁMETRO SUCCESS
         header("Location: index.php?login=success");
         exit();
     } else {
@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_iniciar'])) {
         $sql_audit = "INSERT INTO auditoria (usuario_intentado, resultado) VALUES (?, 'ERROR')";
         sqlsrv_query($conn, $sql_audit, array($audit_user));
         
-        // REDIRECCIÓN CON ERROR PARA LIMPIAR EL FORMULARIO
+        // REDIRECCIÓN A LA MISMA PÁGINA CON PARÁMETRO ERROR
         header("Location: index.php?login=error");
         exit();
     }
@@ -69,8 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_iniciar'])) {
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #0a0a0f 0%, #16213e 50%, #0f3460 100%);
-            min-height: 100vh;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
         }
 
         .atm-container {
@@ -102,8 +101,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_iniciar'])) {
             color: #333; font-weight: 500; transition: all 0.3s ease;
         }
 
-        input:focus { outline: none; background: white; transform: scale(1.02); }
-
         .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 25px 0; }
         button.key {
             padding: 18px; font-size: 1.3em; cursor: pointer;
@@ -112,14 +109,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_iniciar'])) {
             color: white; font-weight: 600; transition: all 0.2s ease;
         }
 
-        button.key:hover { transform: translateY(-2px); background: #3d4758; }
-
         .btn-iniciar {
             background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
             color: white; padding: 16px; border: none; cursor: pointer;
-            font-weight: 700; width: 100%; border-radius: 10px;
-            text-transform: uppercase; letter-spacing: 1.5px;
-            box-shadow: 0 6px 20px rgba(26, 188, 156, 0.3);
+            font-weight: 700; width: 100%; border-radius: 10px; text-transform: uppercase;
         }
 
         .audit-container {
@@ -129,12 +122,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_iniciar'])) {
         }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; border-radius: 12px; overflow: hidden; }
-        th { background: #16a085; color: white; padding: 16px; text-align: left; }
-        td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; }
+        th { background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%); color: white; padding: 16px; text-align: left; }
+        td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; color: #555; }
         .btn-volver {
-            display: inline-block; margin-top: 30px; padding: 14px 30px;
-            background: #764ba2; color: white; text-decoration: none;
-            font-weight: 700; border-radius: 10px;
+            display: inline-block; margin-top: 30px; padding: 14px 30px; text-decoration: none;
+            color: white; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-weight: 700; border-radius: 10px; text-transform: uppercase;
         }
     </style>
 </head>
@@ -144,7 +137,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_iniciar'])) {
     <div class="atm-container">
         <div class="screen">
             LOGIN SENATI - AZURE
-            <span style="font-size: 0.7em; margin-top: 5px;">Sistema de Seguridad</span>
+            <span style="font-size: 0.85em; margin-top: 8px; display: block;">Sistema de Seguridad</span>
             <?php echo $mensaje; ?>
         </div>
         <form method="POST">
@@ -152,12 +145,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_iniciar'])) {
                 <label>Usuario:</label>
                 <input type="text" name="usuario" id="usuario" required autocomplete="off">
             </div>
-
             <div class="form-group">
                 <label>PIN de Acceso:</label>
                 <input type="password" name="pin" id="pin" readonly placeholder="••••••">
             </div>
-
             <div class="keypad">
                 <?php for($i=1; $i<=9; $i++): ?>
                     <button type="button" class="key" onclick="addNumber(<?php echo $i; ?>)"><?php echo $i; ?></button>
@@ -171,7 +162,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_iniciar'])) {
 
 <?php else: ?>
     <div class="audit-container">
-        <h2 style="color: #1abc9c;">✔ Acceso Concedido</h2>
+        <h2>✔ Acceso Concedido</h2>
         <h3>Panel de Auditoría - Últimos Intentos de Acceso</h3>
         <table>
             <thead>
@@ -185,13 +176,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_iniciar'])) {
                 <?php
                 $sql_list = "SELECT TOP 10 usuario_intentado, resultado, fecha_intento FROM auditoria ORDER BY fecha_intento DESC";
                 $res_list = sqlsrv_query($conn, $sql_list);
-                while ($row_audit = sqlsrv_fetch_array($res_list, SQLSRV_FETCH_ASSOC)) {
-                    $color = ($row_audit['resultado'] == "CORRECTO") ? "#27ae60" : "#e74c3c";
-                    echo "<tr>
-                            <td>" . htmlspecialchars($row_audit['usuario_intentado']) . "</td>
-                            <td style='color:$color; font-weight:bold;'>" . $row_audit['resultado'] . "</td>
-                            <td>" . $row_audit['fecha_intento']->format('d/m/Y H:i:s') . "</td>
-                          </tr>";
+                if ($res_list !== false) {
+                    while ($row_audit = sqlsrv_fetch_array($res_list, SQLSRV_FETCH_ASSOC)) {
+                        $color = ($row_audit['resultado'] == "CORRECTO") ? "#27ae60" : "#e74c3c";
+                        echo "<tr>
+                                <td>" . htmlspecialchars($row_audit['usuario_intentado']) . "</td>
+                                <td style='color:$color; font-weight:bold;'>" . $row_audit['resultado'] . "</td>
+                                <td>" . $row_audit['fecha_intento']->format('d/m/Y H:i:s') . "</td>
+                              </tr>";
+                    }
                 }
                 ?>
             </tbody>
