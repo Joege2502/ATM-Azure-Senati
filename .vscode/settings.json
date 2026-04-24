@@ -1,0 +1,4 @@
+{
+  "appService.defaultWebAppToDeploy": "/subscriptions/5579049e-fe36-4df2-bcc7-556f6e5eac18/resourceGroups/sistemaDeGestion2005/providers/Microsoft.Web/sites/autenticacionnumeral",
+  "appService.deploySubpath": "."
+}
