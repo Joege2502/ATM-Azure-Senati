@@ -1,14 +1,7 @@
 <?php
-// 1. Configuración de la conexión a Azure SQL
-$serverName = "sdgtacna2005-database.database.windows.net";
-$connectionOptions = array(
-    "Database" => "tareaochodb",
-    "Uid" => "adminJorge", 
-    "PWD" => "12345678_j", 
-    "CharacterSet" => "UTF-8"
-);
+// 1. Llamamos a la conexión (Eliminamos el código repetido)
+require_once 'conexion.php'; 
 
-$conn = sqlsrv_connect($serverName, $connectionOptions);
 $mensaje = "";
 $acceso_concedido = false; 
 
