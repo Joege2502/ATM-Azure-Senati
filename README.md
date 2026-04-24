@@ -24,8 +24,21 @@ El objetivo principal es demostrar la integración de una aplicación web PHP co
 
 ## 📁 Estructura del Proyecto
 
-- `index.php`: Archivo principal que contiene toda la lógica de negocio (PHP), la interfaz de usuario (HTML), estilos (CSS) y scripts (JavaScript) en un solo archivo optimizado.
-- `conexion.php`: Archivo de configuración para establecer la conexión segura a Azure SQL Database utilizando el driver `sqlsrv` de PHP.
+- `index.php`: Archivo principal que integra la lógica de negocio y la interfaz de usuario.
+  - **Autenticación:** Procesa las peticiones POST, valida las credenciales y maneja las sesiones mediante parámetros URL.
+  - **Interfaz ATM:** Implementa el teclado numérico virtual, campos de texto dinámicos y el sistema de feedback visual (Spinners).
+  - **Panel de Auditoría:** Realiza consultas en tiempo real a Azure SQL para mostrar los últimos 10 intentos de acceso (Correctos/Errores).
+  - **Scripts:** Contiene la lógica de JavaScript para el control del PIN de 6 dígitos y el borrado inteligente (clic/doble clic).
+
+- `conexion.php`: Módulo de conectividad centralizado.
+  - Configura los parámetros de conexión con Azure SQL Database (ServerName, DB, UID, PWD).
+  - Implementa un **Manejador de Excepciones**: si la conexión falla, redirige automáticamente al usuario hacia `error.php` para evitar la exposición de errores técnicos.
+
+- `error.php`: Página de contingencia y experiencia de usuario.
+  - Diseñada para informar fallos de red o mantenimiento en la nube.
+  - Incluye una opción de "Reintento" que permite al usuario volver a intentar la conexión una vez que el servicio de Azure esté disponible.
+
+- `README.md`: Documentación completa del proyecto, tecnologías y guía de despliegue.
 
 ## 🔑 Características Principales
 
