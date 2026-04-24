@@ -103,7 +103,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_iniciar'])) {
             color: white; font-weight: 600; transition: all 0.2s ease;
         }
 
-        /* Estilo del Spinner de carga */
+        /* Estilos para el Tooltip de Borrar */
+        .btn-borrar-wrapper { position: relative; grid-column: span 2; }
+        
+        .tooltip-text {
+            visibility: hidden;
+            width: 160px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 10;
+            bottom: 110%;
+            left: 50%;
+            margin-left: -80px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.7em;
+            border: 1px solid #e74c3c;
+            pointer-events: none;
+        }
+
+        .btn-borrar-wrapper:hover .tooltip-text { visibility: visible; opacity: 1; }
+
         .spinner {
             display: none; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3);
             border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite;
@@ -124,9 +148,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_iniciar'])) {
             animation: slideUp 0.6s ease-out;
         }
 
-        /* Mejora Responsive para tablas */
         .table-responsive { width: 100%; overflow-x: auto; }
-
         table { width: 100%; border-collapse: collapse; margin-top: 10px; border-radius: 12px; overflow: hidden; }
         th { background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%); color: white; padding: 16px; text-align: left; }
         td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; color: #555; }
@@ -160,7 +182,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_iniciar'])) {
                     <button type="button" class="key" onclick="addNumber(<?php echo $i; ?>)"><?php echo $i; ?></button>
                 <?php endfor; ?>
                 <button type="button" class="key" onclick="addNumber(0)">0</button>
-                <button type="button" class="key" onclick="clearPin()" style="grid-column: span 2; background: #e74c3c;">Borrar</button>
+                
+                <div class="btn-borrar-wrapper">
+                    <span class="tooltip-text">Doble clic para borrar usuario</span>
+                    <button type="button" class="key" onclick="clearPin()" ondblclick="clearAll()" style="width: 100%; background: #e74c3c;">Borrar</button>
+                </div>
             </div>
             <button type="submit" name="btn_iniciar" id="btn_text" class="btn-iniciar">
                 <div id="loader" class="spinner"></div>
@@ -211,11 +237,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_iniciar'])) {
         const pinField = document.getElementById('pin');
         if(pinField.value.length < 6) pinField.value += num;
     }
+
     function clearPin() {
         document.getElementById('pin').value = '';
     }
 
-    // Mejora de Feedback Visual
+    // Nueva función para borrar todo
+    function clearAll() {
+        document.getElementById('pin').value = '';
+        document.getElementById('usuario').value = '';
+        document.getElementById('usuario').focus();
+    }
+
     function loadingFeedback() {
         document.getElementById('loader').style.display = 'block';
         document.getElementById('btn_label').innerText = 'Verificando...';
