@@ -3,7 +3,7 @@ $serverName = "sdgtacna2005-database.database.windows.net";
 $connectionOptions = array(
     "Database" => "tareaochodb",
     "Uid" => "adminJorge", 
-    "PWD" => "12345678_x",
+    "PWD" => "12345678_j",
     "CharacterSet" => "UTF-8"
 );
 
